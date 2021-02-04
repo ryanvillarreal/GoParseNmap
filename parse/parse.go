@@ -11,7 +11,11 @@ import(
 	"encoding/xml"
 	"io/ioutil"
 	"strings"
+	"os"
+	"sort"
+	"strconv"
 )
+
 
 // PrepWork helps to simplify the code base by performing the byteValue open
 // and then unmarshals the XML and sends it back to the relevant function
@@ -27,6 +31,23 @@ func PrepWork(filename string) Nmaprun {
 	return data
 }
 
+// Contains will check a slice for a unique value and will append if not within
+func Contains(s []int,e int) bool{
+	for _, a := range s {
+        if a == e {
+            return true
+        }
+    }
+    return false
+}
+
+// MultiLine will take in an int slice convert back to 
+func MultiLine(s []int){
+	sort.Ints(s)
+	for i := 0; i < len(s); i++{
+		fmt.Println(s[i])
+	}
+}
 
 // FILE INFORMATION ------------------------------------------------------------
 
@@ -87,19 +108,93 @@ func GetUpHosts(filename string){
 // had at least one port open.
 func GetHostsWithOpenPorts(filename string){
 	data := PrepWork(filename)
-	fmt.Println("Hosts Scanned: ")
+	// create the slice for holding unique ports
+	s := make([]int, 0)
 	for i := 0; i < len(data.Hosts); i++{
-		fmt.Println(data.Hosts[i].Address.Addr)
+		for j := 0; j < len(data.Hosts[i].PortData); j++{
+			if (len(data.Hosts[i].PortData[j].SinglePort)) > 0{
+				for k := 0; k < len(data.Hosts[i].PortData[j].SinglePort); k++{
+					port_int,err := strconv.Atoi(data.Hosts[i].PortData[j].SinglePort[k].PortID)
+					if err != nil{
+						fmt.Println("Ruh Roh Raggy")
+						os.Exit(0)
+					}
+					if Contains(s,port_int) == false{
+						s = append(s,port_int)
+					}
+				}
+			}
+		}
 	}
+	// convert port strings to ints for proper sorting
+	MultiLine(s)
 }
 
 
 // PORT INFORMATION -----------------------------------------------------------
 
+// GetBanners will retrieve the Service Name as reported by Nmap
 func GetBanners(filename string){
 	data := PrepWork(filename)
-	arguments := data.Args
-	fmt.Println("Banners: " + arguments)
+	fmt.Println("Banners: " + data.Args)
 }
 
+
+// GetUpPorts will return a list of all ports identified by Nmap that have a state of "open"
+// Some False Positives will exist since some states might be filtered
+func GetUpPorts(filename string){
+	data := PrepWork(filename)
+	// create the slice for holding unique ports
+	s := make([]int, 0)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].PortData); j++{
+			if (len(data.Hosts[i].PortData[j].SinglePort)) > 0{
+				for k := 0; k < len(data.Hosts[i].PortData[j].SinglePort); k++{
+					for l := 0; l < len(data.Hosts[i].PortData[j].SinglePort[k].States); l++{
+						if strings.ToLower(data.Hosts[i].PortData[j].SinglePort[k].States[l].StateState) == "open"{
+							port_int,err := strconv.Atoi(data.Hosts[i].PortData[j].SinglePort[k].PortID)
+							if err != nil{
+								fmt.Println("Ruh Roh Raggy")
+								os.Exit(0)
+							}
+							if Contains(s,port_int) == false{
+								s = append(s,port_int)
+							}
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	// convert int slice back into a multi-line list for easy formatting options
+	MultiLine(s)
+
+}
+
+// GetPorts will return a list of all ports identified by 
+// Some False Positives will exist since some states might be filtered
+func GetAllPorts(filename string){
+	data := PrepWork(filename)
+	// create the slice for holding unique ports
+	s := make([]int, 0)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].PortData); j++{
+			if (len(data.Hosts[i].PortData[j].SinglePort)) > 0{
+				for k := 0; k < len(data.Hosts[i].PortData[j].SinglePort); k++{
+					port_int,err := strconv.Atoi(data.Hosts[i].PortData[j].SinglePort[k].PortID)
+					if err != nil{
+						fmt.Println("Ruh Roh Raggy")
+						os.Exit(0)
+					}
+					if Contains(s,port_int) == false{
+						s = append(s,port_int)
+					}
+				}
+			}
+		}
+	}
+	// convert port strings to ints for proper sorting
+	MultiLine(s)
+}
 

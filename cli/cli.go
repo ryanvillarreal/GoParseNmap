@@ -88,7 +88,6 @@ func CommandLine(){
     app.Commands = []cli.Command{
         {
             Name:  "args",
-            Aliases: []string{"a"},
             Usage: "Retrieves the Arguments used for the Nmap scan.",
             Flags: myFlags,
             // the action, or code that will be executed when
@@ -121,6 +120,30 @@ func CommandLine(){
                 // a simple lookup function
                 OpenFile(filename)
                 parse.GetHosts(filename)
+                return nil
+            },
+        },
+        {
+            Name:  "all-ports",
+            Usage: "Retrieves all ports that were found with Nmap..",
+            Flags: myFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetAllPorts(filename)
+                return nil
+            },
+        },
+        {
+            Name:  "up-ports",
+            Usage: "Retrieves all ports that were found with Nmap..",
+            Flags: myFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetUpPorts(filename)
                 return nil
             },
         },
