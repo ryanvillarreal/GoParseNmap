@@ -16,6 +16,8 @@ import(
 // define the variables first.
 var(
 	filename string
+    unfinished bool
+    search string
 )
 
 func Testing(){
@@ -72,11 +74,14 @@ func CommandLine(){
     app.Name = "GoParseNmap"
     app.Usage = "Parsing Nmap XML Files Made Easy."
     app.Author = "l33tllama"
-    app.Version = "0.0.1"
+    app.Version = "0.2"
 
-    // We'll be using the same flag for all our commands
-    // so we'll define it up here
-    myFlags := []cli.Flag{
+    // FLAGS -----------------------------------------------------------------------------
+    // you can create multiple flags and call them within the Commands
+
+
+    // baseFlags will be used for extraction only commands
+    baseFlags := []cli.Flag{
         cli.StringFlag{
             Name:  "file",
             Required: true,
@@ -84,12 +89,28 @@ func CommandLine(){
         },
     }
 
+    // extraFlags will be used for search function commands
+    extraFlags := []cli.Flag{
+        cli.StringFlag{
+            Name:  "file",
+            Required: true,
+            Destination: &filename,
+        },
+        cli.StringFlag{
+            Name:  "search",
+            Required: true,
+            Destination: &search,
+        },
+    }
+
     // we create our commands
     app.Commands = []cli.Command{
+        // commands organized by function - will be automatically sorted during command line execution
+        // FILE INFORMATION --------------------------------------------------------------------------------------
         {
-            Name:  "args",
+            Name:  "nmap-cmdline",
             Usage: "Retrieves the Arguments used for the Nmap scan.",
-            Flags: myFlags,
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // a simple lookup function
@@ -101,7 +122,7 @@ func CommandLine(){
         {
             Name:  "version",
             Usage: "Retrieves the Version of Nmap used to perform the scan.",
-            Flags: myFlags,
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
 
@@ -112,9 +133,35 @@ func CommandLine(){
             },
         },
         {
+            Name:  "start-time",
+            Usage: "Retrieves the time the Nmap scan started.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetStartTime(filename)
+                return nil
+            },
+        },
+        {
+            Name:  "stop-time",
+            Usage: "Retrieves the time the Nmap scan stopped.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetStopTime(filename)
+                return nil
+            },
+        },
+
+        // HOST INFORMATION ----------------------------------------------------------------------------------
+        {
             Name:  "all-hosts",
             Usage: "Retrieves all Hosts that were scanned with Nmap.",
-            Flags: myFlags,
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // a simple lookup function
@@ -124,9 +171,82 @@ func CommandLine(){
             },
         },
         {
+            Name:  "up-hosts",
+            Usage: "Retrieves all Hosts that were considered 'Up' by Nmap.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetUpHosts(filename)
+                return nil
+            },
+        },
+        {
+            Name:  "host-ports",
+            Usage: "Retrieves the time the Nmap scan stopped.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetHostPorts(filename)
+                return nil
+            },
+        },
+        {
+            Name:  "hosts",
+            Usage: "Retrieves all hosts with at least one port open.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                OpenFile(filename)
+                parse.GetHosts(filename)
+                return nil
+            },
+        },
+        // PORT INFORMATION -----------------------------------------------------------
+        {
+            Name:  "banner",
+            Usage: "Retrieves a list of all ports with a specific service taht are open. Requires a search flag.",
+            UsageText: "banner requires the --search [SEARCH TERM] flag.",
+            Flags: extraFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // use the search field to grep through the results
+                parse.BannerSearch(filename,search)
+                return nil
+            },
+        },
+        {
+            Name:  "smb-hosts",
+            Usage: "Retrieves a list of all hosts with SMB open.",
+            UsageText: "banner requires the --search [SEARCH TERM] flag.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // use the search field to grep through the results
+                parse.GetSMB(filename)
+                return nil
+            },
+        },
+        {
+            Name:  "smb-message",
+            Usage: "Retrieves a list of all hosts with SMB open AND Message Signing Disabled.",
+            UsageText: "banner requires the --search [SEARCH TERM] flag.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // use the search field to grep through the results
+                parse.BannerSearch(filename,search)
+                return nil
+            },
+        },
+        {
             Name:  "all-ports",
             Usage: "Retrieves all ports that were found with Nmap..",
-            Flags: myFlags,
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // a simple lookup function
@@ -138,7 +258,7 @@ func CommandLine(){
         {
             Name:  "up-ports",
             Usage: "Retrieves all ports that were found with Nmap..",
-            Flags: myFlags,
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // a simple lookup function
@@ -148,41 +268,46 @@ func CommandLine(){
             },
         },
         {
-            Name:  "up-hosts",
-            Usage: "Retrieves all Hosts that were considered 'Up' by Nmap.",
-            Flags: myFlags,
+            Name:  "blocked-ports",
+            Usage: "Retrieves all ports that were found with Nmap..",
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // a simple lookup function
                 OpenFile(filename)
-                parse.GetUpHosts(filename)
+                parse.GetBlockedPorts(filename)
+                return nil
+            },
+        },
+
+        // HTTP searches ----------------------------------------------------
+        // the following services are detected as HTTP: http, https, http-alt, 
+        // https-alt, http-proxy, sip, rtsp, soap, vnc-http, caldav 
+        // (potentially incomplete)
+        {
+            Name:  "http-ports",
+            Usage: "Generates a line separated list of all HTTP(s) ports.",
+            Flags: baseFlags,
+            // the action, or code that will be executed when
+            Action: func(c *cli.Context) error {
+                // a simple lookup function
+                fmt.Println("Will eventually export in format: http://<ip>:port")
                 return nil
             },
         },
         {
-            Name:  "starttime",
-            Usage: "Retrieves the time the Nmap scan started.",
-            Flags: myFlags,
+            Name:  "http-info",
+            Usage: "Generates a line separated list of all HTTP(s) ports.",
+            Flags: baseFlags,
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // a simple lookup function
-                OpenFile(filename)
-                parse.GetStartTime(filename)
+                fmt.Println("Will eventually export ")
                 return nil
             },
         },
-        {
-            Name:  "stoptime",
-            Usage: "Retrieves the time the Nmap scan stopped.",
-            Flags: myFlags,
-            // the action, or code that will be executed when
-            Action: func(c *cli.Context) error {
-                // a simple lookup function
-                OpenFile(filename)
-                parse.GetStopTime(filename)
-                return nil
-            },
-        },
+
+        // CUSTOM SEARCHES ------------------------------------------
     }
 
     // sorting the commands for uniformity between versions
