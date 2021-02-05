@@ -166,7 +166,7 @@ func CommandLine(){
             Action: func(c *cli.Context) error {
                 // a simple lookup function
                 OpenFile(filename)
-                parse.GetHosts(filename)
+                parse.GetAllHosts(filename)
                 return nil
             },
         },
@@ -202,7 +202,7 @@ func CommandLine(){
             Action: func(c *cli.Context) error {
                 // a simple lookup function
                 OpenFile(filename)
-                parse.GetHosts(filename)
+                parse.GetHostsWithOpenPorts(filename)
                 return nil
             },
         },
@@ -239,7 +239,7 @@ func CommandLine(){
             // the action, or code that will be executed when
             Action: func(c *cli.Context) error {
                 // use the search field to grep through the results
-                parse.BannerSearch(filename,search)
+                parse.GetSMBMessage(filename)
                 return nil
             },
         },
