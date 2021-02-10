@@ -4,12 +4,16 @@ Extracts information from Nmap XML files quickly.
 **Table of Contents**
 - [GoParseNmap](#GoParseNmap)
   - [Examples](#examples)
+  - [Usage] (#usage)
+  - [Changelog] (#changelog)
+  - [ToDo] (#todo)
+  - [Contribute] (#contribute)
 
 ## Examples
 
 ## Usage
 
-  Usage: ./GoParseNmap [COMMAND]... --file <nmap-xml-output>
+  Usage: `./GoParseNmap [COMMAND]... --file <nmap-xml-output>`
   
    all-hosts      Retrieves all Hosts that were scanned with Nmap.
    
