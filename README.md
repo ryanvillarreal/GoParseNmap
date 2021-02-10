@@ -75,11 +75,15 @@ Requirements:
 * Golang (if building from source)
 
 Check out the repository and run it: 
+  ```
   git clone https://github.com/ryanvillarreal/GoParseNmap
   cd GoParseNmap
   git build . 
   ./GoParseNmap
+  ```
   
 Check out with Go Get: 
+```
   go get github.com/ryanvillarreal/GoParseNmap
+ ```
   
