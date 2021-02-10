@@ -11,6 +11,8 @@ Extracts information from Nmap XML files quickly.
 
 ## Examples
 
+Examples here
+
 ## Usage
 
   Usage: `./GoParseNmap [COMMAND]... --file <nmap-xml-output>`
