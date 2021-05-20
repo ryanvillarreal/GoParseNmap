@@ -1,8 +1,8 @@
-# GoParseNmap
+# goparse
 Extracts information from Nmap XML files quickly. 
 
 **Table of Contents**
-- [GoParseNmap](#GoParseNmap)
+- [goparse](#goparse)
   - [Examples](#examples)
   - [Usage] (#usage)
   - [Changelog] (#changelog)
