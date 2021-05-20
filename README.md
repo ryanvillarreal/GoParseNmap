@@ -15,7 +15,7 @@ Examples here
 
 ## Usage
 
-  Usage: `./GoParseNmap [COMMAND]... --file <nmap-xml-output>`
+  Usage: `./goparse [COMMAND]... --file <nmap-xml-output>`
   
    all-hosts      Retrieves all Hosts that were scanned with Nmap.
    
@@ -76,14 +76,14 @@ Requirements:
 
 Check out the repository and run it: 
   ```
-  git clone https://github.com/ryanvillarreal/GoParseNmap
-  cd GoParseNmap
+  git clone https://github.com/ryanvillarreal/goparse
+  cd goparse
   git build . 
   ./GoParseNmap
   ```
   
 Check out with Go Get: 
 ```
-  go get github.com/ryanvillarreal/GoParseNmap
+  go get github.com/ryanvillarreal/goparse
  ```
   
