@@ -78,8 +78,8 @@ Check out the repository and run it:
   ```
   git clone https://github.com/ryanvillarreal/goparse
   cd goparse
-  git build . 
-  ./GoParseNmap
+  go build . 
+  ./goparse
   ```
   
 Check out with Go Get: 
