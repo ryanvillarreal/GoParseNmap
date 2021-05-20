@@ -9,7 +9,7 @@ import(
 
     // external imports
     "github.com/urfave/cli"
-    "github.com/ryanvillarreal/GoParseNmap/parse"
+    "github.com/ryanvillarreal/goparse/parse"
 )
 
 

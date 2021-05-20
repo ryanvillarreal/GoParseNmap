@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ryanvillarreal/GoParseNmap/cli"
+	"github.com/ryanvillarreal/goparse/cli"
 )
 
 func main(){

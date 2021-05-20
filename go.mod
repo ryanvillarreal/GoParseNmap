@@ -1,4 +1,4 @@
-module github.com/ryanvillarreal/GoParseNmap
+module github.com/ryanvillarreal/goparse
 
 go 1.15
 
