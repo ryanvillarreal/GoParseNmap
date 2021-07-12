@@ -1,21 +1,24 @@
 /* Package Burp Suite parses Nmap XML data into a similary formed struct.
- 
-   I was trying to create the structs by hand... by myself and it didn't
-   go well... so I found this project where quite a few individuals had been
-   working on it. They probably know more than me. 
-   https://github.com/lair-framework/go-nmap
-   https://pkg.go.dev/github.com/tomsteele/go-nmap#Parse
 
 */
 package parse
 
-// import (
-// 	"encoding/xml"
-// 	"strconv"
-// 	"time"
-// )
+import (
+   "encoding/xml"
+   )
 
-// type BurpItems struct{
 
-// 	BurpVersion	string	`xml:"items"`
-// }
+// BurpRun contains all the data for a single nmap scan.
+type BurpRun struct {
+
+}
+
+
+// Parse takes a byte array of Burp Suite xml data and unmarshals it into an
+// BurpRun struct. All elements are returned as strings, it is up to the caller
+// to check and cast them to the proper type.
+func ParseBurp(content []byte) (*BurpRun, error) {
+   r := &BurpRun{}
+   err := xml.Unmarshal(content, r)
+   return r, err
+}

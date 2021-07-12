@@ -115,11 +115,11 @@ func CommandLine() {
         Usage:       "Parsing Burp",
         Subcommands: []*cli.Command{
           {
-            Name:  "BurpStuff",
-            Usage: "add a new template",
+            Name:  "version",
+            Usage: "Get Version of BurpSuite used.",
             Flags: baseFlags,
             Action: func(c *cli.Context) error {
-              fmt.Println("new task template: ", c.Args().First())
+              parse.GetBurpVersion(filename)
               return nil
             },
           },
@@ -272,6 +272,17 @@ func CommandLine() {
                // a simple lookup function
                 OpenFile(filename)
                 parse.GetUpPorts(filename)
+                return nil
+            },
+          },
+          {
+            Name:  "service-names",
+            Usage: "Retrieves all names of open ports from Nmap scan.",
+            Flags: baseFlags,
+            Action: func(c *cli.Context) error {
+               // a simple lookup function
+                OpenFile(filename)
+                parse.GetServiceNames(filename)
                 return nil
             },
           },
