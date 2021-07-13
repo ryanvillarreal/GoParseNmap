@@ -7,6 +7,8 @@ import(
 	"os"
     "time"
     "sort"
+    "strconv"
+    //"reflect"
 
     // external imports
     "github.com/urfave/cli/v2"
@@ -16,14 +18,31 @@ import(
 
 // define the variables first.
 var(
-	filename string
+	filename   string
     unfinished bool
-    search string
+    search     string
     formatType string
+    port       int
 )
 
-func Testing(){
-	fmt.Println("hello, world")
+// CheckPort will check to make sure the port is between 1 - 65,535 and then returns an int to be used
+func CheckPort(search string) int{
+    port := 0
+	port, err := strconv.Atoi(search)
+    // error out if port provided is not a valid int
+    if err != nil {
+        // handle errors
+        fmt.Println("Ports specified must be a type [int]")
+        os.Exit(2)
+    }
+    if (port >= 1 && port <= 65535){
+        return port
+    } else{
+        fmt.Println("Port must be within the valid range of 1 - 65535")
+        os.Exit(2)
+    }
+    // should never get here, but I guess go requires a return for everything.
+    return 0
 }
 
 // GetFileContenType will grab the first 512 bytes of the file
@@ -73,6 +92,8 @@ func OpenFile(filename string) {
 
 // This is basically the entry point for the rest of the program
 func CommandLine() {
+    // add support for Globs here.
+
     // Define Base Flags
     baseFlags := []cli.Flag {
           &cli.StringFlag{
@@ -244,6 +265,31 @@ func CommandLine() {
                 return nil
             },
           },
+          {
+            Name:  "hosts-to-port",
+            Usage: "Extracts a list of all hosts that have the given port open in host (hostname) format.",
+            Flags: extraFlags,
+            Action: func(c *cli.Context) error {
+               // a simple lookup function
+                OpenFile(filename)
+                // need to check port input here
+                port = CheckPort(search)
+                parse.GetHostsToPort(filename,port)
+                return nil
+            },
+          },
+          {
+            Name:  "host-ports-protocol",
+            Usage: "Extracts a list of all hosts that have the given port open in host (hostname) format.",
+            Flags: baseFlags,
+            Action: func(c *cli.Context) error {
+               // a simple lookup function
+                OpenFile(filename)
+                // need to check port input here
+                parse.GetHostsPortsProtocol(filename)
+                return nil
+            },
+          },
           // PORT INFORMATION -----------------------------------------------------------
           {
             Name:  "banner",
@@ -280,6 +326,17 @@ func CommandLine() {
           },
           {
             Name:  "all-ports",
+            Usage: "Retrieves all ports without checking Open/Closed/TCPWrapped with Nmap.",
+            Flags: baseFlags,
+            Action: func(c *cli.Context) error {
+               // a simple lookup function
+                OpenFile(filename)
+                parse.GetAllPorts(filename)
+                return nil
+            },
+          },
+          {
+            Name:  "ports",
             Usage: "Retrieves all ports that were found to be Open with Nmap.",
             Flags: baseFlags,
             Action: func(c *cli.Context) error {
@@ -307,7 +364,7 @@ func CommandLine() {
             Action: func(c *cli.Context) error {
                // a simple lookup function
                 OpenFile(filename)
-                parse.GetUpPorts(filename)
+                parse.GetBlockedPorts(filename)
                 return nil
             },
           },
@@ -323,7 +380,7 @@ func CommandLine() {
             Action: func(c *cli.Context) error {
                // a simple lookup function
                 OpenFile(filename)
-                fmt.Println("Will eventually export in format: http://<ip>:port")
+                parse.GetHTTPPorts(filename)
                 return nil
             },
           },
