@@ -50,7 +50,7 @@ func (t *Timestamp) UnmarshalXMLAttr(attr xml.Attr) (err error) {
 	return t.str2time(attr.Value)
 }
 
-// NmapRun is contains all the data for a single nmap scan.
+// NmapRun contains all the data for a single nmap scan.
 type NmapRun struct {
 	Scanner          string         `xml:"scanner,attr" json:"scanner"`
 	Args             string         `xml:"args,attr" json:"args"`
@@ -331,7 +331,7 @@ type Times struct {
 	To   string `xml:"to,attr" json:"to"`
 }
 
-// RunStats contains statistics for a
+// RunStats contains statistics for aNmapRun
 // finished Nmap scan.
 type RunStats struct {
 	Finished Finished  `xml:"finished" json:"finished"`
