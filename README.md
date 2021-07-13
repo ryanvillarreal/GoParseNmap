@@ -1,13 +1,15 @@
 # goparse
-Extracts information from Nmap XML files quickly. 
+Extracts information from Nmap/Burp XML files quickly. 
+v0.03
 
 **Table of Contents**
 - [goparse](#goparse)
-  - [Examples](#examples)
-  - [Usage] (#usage)
-  - [Changelog] (#changelog)
-  - [ToDo] (#todo)
-  - [Contribute] (#contribute)
+  - [Examples](#Examples)
+  - [Usage] (#Usage)
+  - [Changelog] (#Changelog)
+  - [ToDo] (#ToDO)
+  - [Contribute] (#Contribute)
+  - [Installation] (#Installation)
 
 ## Examples
 
@@ -15,8 +17,15 @@ Examples here
 
 ## Usage
 
-  Usage: `./goparse [COMMAND]... --file <nmap-xml-output>`
+   Usage: `./goparse [COMMAND]... --file <nmap-xml-output>`
   
+   Available Commands: 
+   nmap [n]       Allows access to the Nmap subcommands
+   burp [b]       Allows access to the Burp subcommands
+
+
+### Nmap Subcommands
+```
    all-hosts      Retrieves all Hosts that were scanned with Nmap.
    
    all-ports      Retrieves all ports that were found with Nmap.
@@ -52,16 +61,28 @@ Examples here
    version        Retrieves the Version of Nmap used to perform the scan.
    
    help, h        Shows a list of commands or help for one command
+```
+
+### Burp Subcommands
+ ```
+   version        Retrieves the Version of Burp Suite used to test
+
+   mime-search    Retrieves unique list of URLs with the specified MIME type
+ ```
 
   
 ## Changelog
-
+  - v.03
+      - Updated to urfave/cli/v2
+      - Aaron added ability to get output of service names
+      - Added the ability to search for a service name and get a list of IPs in return
+      - Added basic Burp Suite XML parsing for Version and MIME type search   
 
 ## ToDo
 1. Glob support for multiple file ingestion 
 2. Clean up documenation
 3. Build for multiple architecture types
-4. Functionality needs
+4. Request by @deadjakk - ability to intake a blob of data and return various format outputs (i.e. - IPs, Mimikatz output, Email, Domains)
 
 ## Contribute
 
@@ -83,7 +104,7 @@ Check out the repository and run it:
   ```
   
 Check out with Go Get: 
-```
+ ```
   go get github.com/ryanvillarreal/goparse
  ```
   
