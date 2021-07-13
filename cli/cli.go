@@ -326,12 +326,23 @@ func CommandLine() {
           },
           {
             Name:  "all-ports",
-            Usage: "Retrieves all ports that were found to be Open with Nmap.",
+            Usage: "Retrieves all ports without checking Open/Closed/TCPWrapped with Nmap.",
             Flags: baseFlags,
             Action: func(c *cli.Context) error {
                // a simple lookup function
                 OpenFile(filename)
                 parse.GetAllPorts(filename)
+                return nil
+            },
+          },
+          {
+            Name:  "ports",
+            Usage: "Retrieves all ports that were found to be Open with Nmap.",
+            Flags: baseFlags,
+            Action: func(c *cli.Context) error {
+               // a simple lookup function
+                OpenFile(filename)
+                parse.GetUpPorts(filename)
                 return nil
             },
           },
@@ -353,7 +364,7 @@ func CommandLine() {
             Action: func(c *cli.Context) error {
                // a simple lookup function
                 OpenFile(filename)
-                parse.GetUpPorts(filename)
+                parse.GetBlockedPorts(filename)
                 return nil
             },
           },
@@ -370,7 +381,6 @@ func CommandLine() {
                // a simple lookup function
                 OpenFile(filename)
                 parse.GetHTTPPorts(filename)
-                //fmt.Println("Will eventually export in format: http://<ip>:port")
                 return nil
             },
           },

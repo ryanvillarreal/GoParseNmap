@@ -284,8 +284,6 @@ func GetHostsToPort(filename string, port int){
 	}
 }
 
-
-
 // PORT INFORMATION -----------------------------------------------------------
 
 // BannerSearch will retrieve the Service Name as reported by Nmap
@@ -443,7 +441,7 @@ func GetUpPorts(filename string){
 			}
 		}
 	}
-	MultiLineInt(s)
+	SingleLineInt(s)
 }
 
 // GetUpPorts will return a list of all ports identified by Nmap that have a state of "open"
