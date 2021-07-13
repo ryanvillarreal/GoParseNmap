@@ -60,12 +60,24 @@ func Contains(s []int,e int) bool{
     return false
 }
 
-// MultiLineInt will take in an int slice convert back to 
+
+// MultiLineInt will take in an int slice convert back to a multi line output
 func MultiLineInt(s []int){
 	sort.Ints(s)
 	for i := 0; i < len(s); i++{
 		fmt.Println(s[i])
 	}
+}
+
+// MultiLineStr will take in an int slice convert back to a single line as a string for ingestion to other tools
+func SingleLineInt(s []int){
+	sort.Ints(s)
+	t := make([]string,0)
+	for i := 0; i < len(s); i++{
+		t = append(t,strconv.Itoa(s[i])) 
+	}
+	output := strings.Join(t, `,`)
+	fmt.Println(output)
 }
 
 // MultiLineStr same as above but now with 100% more strings
@@ -74,6 +86,16 @@ func MultiLineStr(s []string){
 	for i := 0; i < len(s); i++{
 		fmt.Println(s[i])
 	}
+}
+
+// SingleLineStr will take in an string slice convert back to a single line as a string for ingestion to other tools
+func SingleLineStr(s []string){
+	t := make([]string,0)
+	for i := 0; i < len(s); i++{
+		t = append(t,s[i]) 
+	}
+	output := strings.Join(t, `,`)
+	fmt.Println(output)
 }
 
 // Unique will take a slice and unique it, returning a new slice
@@ -105,11 +127,8 @@ func GetMimeType(filename string, search string){
 		if strings.ToLower(data.Items[i].MimeType) == strings.ToLower(search){
 			s = append(s,data.Items[i].Url)
 		}
-
 	}
-	MultiLineStr(Unique(s))
-
-	
+	MultiLineStr(Unique(s))	
 }
 
 
@@ -192,7 +211,6 @@ func GetHostsWithOpenPorts(filename string){
 			}
 		}
 	}
-
 }
 
 // GetHosts will return a list of all IP addresses that were tested by Nmap
@@ -204,6 +222,68 @@ func GetAllHosts(filename string){
 		}
 	}
 }
+
+
+// hosts-to-port [port]
+// Extracts a list of all hosts that have the given port open in 'host (hostname)' format.
+func GetHostsPortsProtocol(filename string){
+data := PrepWork(filename)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].Addresses); j++{
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv4"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+						port_str := strconv.Itoa(data.Hosts[i].Ports[k].PortId)
+						protocol := data.Hosts[i].Ports[k].Protocol
+						fmt.Println(data.Hosts[i].Addresses[j].Addr + ":" + port_str + " " + protocol)
+					}
+				}
+			}
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv6"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+						// Print the IP and move on!
+						port_str := strconv.Itoa(data.Hosts[i].Ports[k].PortId)
+						protocol := data.Hosts[i].Ports[k].Protocol
+						fmt.Println(data.Hosts[i].Addresses[j].Addr + ":" + port_str + " " + protocol)
+					}
+				}
+			}
+		}
+	}
+}
+
+
+// 
+// hosts-to-port [port]
+// Extracts a list of all hosts that have the given port open in 'host (hostname)' format.
+func GetHostsToPort(filename string, port int){
+	data := PrepWork(filename)
+	//s := make([]string, 0)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].Addresses); j++{
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv4"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+						if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+							if (data.Hosts[i].Ports[k].PortId == port){
+								fmt.Println(data.Hosts[i].Addresses[j].Addr, data.Hosts[i].Hostnames[0].Name)
+							}
+						}
+					}
+				}
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv6"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+						if (data.Hosts[i].Ports[k].PortId == port){
+								fmt.Println(data.Hosts[i].Addresses[j].Addr, data.Hosts[i].Hostnames[0].Name)
+							}
+					}
+				}
+			}
+		}
+	}
+}
+
 
 
 // PORT INFORMATION -----------------------------------------------------------
@@ -430,7 +510,7 @@ func GetAllPorts(filename string){
 			}
 		}
 	}
-	MultiLineInt(s)
+	SingleLineInt(s)
 }
 
 // GetServiceNames will return a list of all port "names" identified by Nmap that have a state of "open"
@@ -457,4 +537,42 @@ data := PrepWork(filename)
 		}
 	}
 	MultiLineStr(Unique(s))
+}
+
+// GetHTTPPorts will retrieve the any service regarded as an HTTP service from Nmap
+// will only return services that are reported as "open" and in the format http(s)://<ip>:<port>
+func GetHTTPPorts(filename string){
+	data := PrepWork(filename)
+	service := make([]string, 0)
+	service = append(service, "http", "https", "http-alt", "http-proxy", "soap", "sip", "rtsp", "vnc-http", "caldav")
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].Addresses); j++{
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv4"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+						if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+								currentService := strings.ToLower(data.Hosts[i].Ports[k].Service.Name)
+								for l := 0; l < len(service); l++{
+									if currentService == service[l]{
+										port_str := strconv.Itoa(data.Hosts[i].Ports[k].PortId)
+										fmt.Println("http://" + data.Hosts[i].Addresses[j].Addr + ":" + port_str)
+									}
+								}
+							}
+						}
+					}
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv6"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+						currentService := strings.ToLower(data.Hosts[i].Ports[k].Service.Name)
+						for l := 0; l < len(service); l++{
+							if currentService == service[l]{
+								port_str := strconv.Itoa(data.Hosts[i].Ports[k].PortId)
+								fmt.Println("http://" + data.Hosts[i].Addresses[j].Addr + ":" + port_str)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
