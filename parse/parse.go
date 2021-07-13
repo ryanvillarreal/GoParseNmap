@@ -33,6 +33,23 @@ func PrepWork(filename string) *NmapRun {
 	return data
 }
 
+// PrepWork helps to simplify the code base by performing the byteValue open
+// and then unmarshals the XML and sends it back to the relevant function
+func BurpPrepWork(filename string) *BurpRun {
+	// need to open the XML file as a byte array
+	byteValue, _ := ioutil.ReadFile(filename)
+	// initialize our Burp array? 
+	data,err := ParseBurp(byteValue)
+	if err != nil{
+		fmt.Println("Ruh Roh Raggy")
+		os.Exit(0)
+	}
+
+	// once the XML is unmarshalled pass back to the individual
+	// function to specify the data to be extracted.
+	return data
+}
+
 // Contains will check a slice for a unique value and returns a bool if it exists
 func Contains(s []int,e int) bool{
 	for _, a := range s {
@@ -59,7 +76,44 @@ func MultiLineStr(s []string){
 	}
 }
 
+// Unique will take a slice and unique it, returning a new slice
+func Unique(stringSlice []string) []string {
+    keys := make(map[string]bool)
+    list := []string{}
+    for _, entry := range stringSlice {
+        if _, value := keys[entry]; !value {
+            keys[entry] = true
+            list = append(list, entry)
+        }
+    }
+    return list
+}
 
+
+// Burp Suite Parsing here
+// FILE INFORMATION -----------------------------------------------------------
+func GetBurpVersion(filename string){
+	data := BurpPrepWork(filename)
+	fmt.Println(data)
+}
+
+func GetMimeType(filename string, search string){
+	data := BurpPrepWork(filename)
+	s := make([]string, 0)
+	for i := 0; i < len(data.Items); i++{
+		//fmt.Println(data.Items[i].MimeType)
+		if strings.ToLower(data.Items[i].MimeType) == strings.ToLower(search){
+			s = append(s,data.Items[i].Url)
+		}
+
+	}
+	MultiLineStr(Unique(s))
+
+	
+}
+
+
+// Nmap Parsing here
 // FILE INFORMATION ------------------------------------------------------------
 
 // GetVersion prints the version of Nmap used
@@ -157,6 +211,32 @@ func GetAllHosts(filename string){
 // BannerSearch will retrieve the Service Name as reported by Nmap
 // will only return services that are reported as "open"
 func BannerSearch(filename string, search string){
+	data := PrepWork(filename)
+
+	s := make([]string, 0)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].Addresses); j++{
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv4"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+						if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+							if strings.ToLower(data.Hosts[i].Ports[k].Service.Name) == strings.ToLower(search){
+								s = append(s,data.Hosts[i].Addresses[j].Addr)
+							}
+						}
+					}
+				}
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv6"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+						if strings.ToLower(data.Hosts[i].Ports[k].Service.Name) == strings.ToLower(search){
+								s = append(s,data.Hosts[i].Addresses[j].Addr)
+							}
+					}
+				}
+			}
+		}
+	}
+	MultiLineStr(Unique(s))
 
 }
 
@@ -353,3 +433,28 @@ func GetAllPorts(filename string){
 	MultiLineInt(s)
 }
 
+// GetServiceNames will return a list of all port "names" identified by Nmap that have a state of "open"
+// Some False Positives will exist since some states might be filtered
+func GetServiceNames(filename string){
+data := PrepWork(filename)
+	s := make([]string, 0)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].Addresses); j++{
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv4"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+						if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+								s = append(s,data.Hosts[i].Ports[k].Service.Name)
+						}
+					}
+				}
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv6"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+							s = append(s,data.Hosts[i].Ports[k].Service.Name)
+					}
+				}
+			}
+		}
+	}
+	MultiLineStr(Unique(s))
+}
