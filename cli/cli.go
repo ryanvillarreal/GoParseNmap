@@ -292,7 +292,7 @@ func CommandLine() {
           },
           // PORT INFORMATION -----------------------------------------------------------
           {
-            Name:  "banner",
+            Name:  "service-search",
             Usage: "Retrieves a list of all ports with a specific service that are open. Requires a search flag.",
             Flags: extraFlags,
             Action: func(c *cli.Context) error {
