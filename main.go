@@ -5,6 +5,7 @@ import (
 )
 
 func main(){
-	// this is the main package - to call parse packages you have to specify 
+	// This is the Go Entry point - Calls CLI to take control of the main functionality.
+	// This function is left simplistic for easier reading/modification
 	cli.CommandLine()
 }

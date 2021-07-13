@@ -19,7 +19,7 @@ var(
 	filename string
     unfinished bool
     search string
-    //formatType string
+    formatType string
 )
 
 func Testing(){
@@ -71,6 +71,7 @@ func OpenFile(filename string) {
 }
 
 
+// This is basically the entry point for the rest of the program
 func CommandLine() {
     // Define Base Flags
     baseFlags := []cli.Flag {
@@ -94,7 +95,7 @@ func CommandLine() {
           },
     }
 
-  // define the main app
+  // Define the Main CLI App using the Urfave CLI v2 Syntax
   app := &cli.App{
     // Define the App 
     Name: "goparse",
@@ -110,8 +111,11 @@ func CommandLine() {
     // Define the commands
     Commands: []*cli.Command{
       {
+
+        // commands organized by function for Nmap Parsing - will be automatically sorted during command line execution
+        // ---------------------------------------------------BURP -------------------------------------------
         Name:        "burp",
-        Aliases:     []string{"n"},
+        Aliases:     []string{"b"},
         Usage:       "Parsing Burp",
         Subcommands: []*cli.Command{
           {
@@ -119,25 +123,33 @@ func CommandLine() {
             Usage: "Get Version of BurpSuite used.",
             Flags: baseFlags,
             Action: func(c *cli.Context) error {
+              OpenFile(filename)
               parse.GetBurpVersion(filename)
               return nil
             },
           },
           {
-            Name:  "MoarBurpStuff",
-            Usage: "remove an existing template",
+            Name:  "mime-search",
+            Usage: "Search for Request/Responses with a specific MIME type.",
+            Flags: extraFlags,
             Action: func(c *cli.Context) error {
-              fmt.Println("removed task template: ", c.Args().First())
+              OpenFile(filename)
+              parse.GetMimeType(filename,search)
               return nil
             },
           },
         },
       },
+
+
       // commands organized by function for Nmap Parsing - will be automatically sorted during command line execution
+      // --------------------------------------------------- NMAP ---------------------------------------------
       {
         Name:        "nmap",
         Aliases:     []string{"n"},
         Usage:       "Parsing Nmap",
+
+
         // FILE INFORMATION --------------------------------------------------------------------------------------
 
         Subcommands: []*cli.Command{
@@ -185,6 +197,8 @@ func CommandLine() {
                 return nil
             },
           },
+
+
           // HOST INFORMATION ----------------------------------------------------------------------------------
           {
             Name:  "all-hosts",
@@ -233,7 +247,7 @@ func CommandLine() {
           // PORT INFORMATION -----------------------------------------------------------
           {
             Name:  "banner",
-            Usage: "Retrieves a list of all ports with a specific service taht are open. Requires a search flag.",
+            Usage: "Retrieves a list of all ports with a specific service that are open. Requires a search flag.",
             Flags: extraFlags,
             Action: func(c *cli.Context) error {
                // a simple lookup function

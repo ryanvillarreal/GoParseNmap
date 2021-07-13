@@ -95,7 +95,21 @@ func Unique(stringSlice []string) []string {
 func GetBurpVersion(filename string){
 	data := BurpPrepWork(filename)
 	fmt.Println(data)
+}
 
+func GetMimeType(filename string, search string){
+	data := BurpPrepWork(filename)
+	s := make([]string, 0)
+	for i := 0; i < len(data.Items); i++{
+		//fmt.Println(data.Items[i].MimeType)
+		if strings.ToLower(data.Items[i].MimeType) == strings.ToLower(search){
+			s = append(s,data.Items[i].Url)
+		}
+
+	}
+	MultiLineStr(Unique(s))
+
+	
 }
 
 
@@ -197,6 +211,32 @@ func GetAllHosts(filename string){
 // BannerSearch will retrieve the Service Name as reported by Nmap
 // will only return services that are reported as "open"
 func BannerSearch(filename string, search string){
+	data := PrepWork(filename)
+
+	s := make([]string, 0)
+	for i := 0; i < len(data.Hosts); i++{
+		for j := 0; j < len(data.Hosts[i].Addresses); j++{
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv4"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+						if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+							if strings.ToLower(data.Hosts[i].Ports[k].Service.Name) == strings.ToLower(search){
+								s = append(s,data.Hosts[i].Addresses[j].Addr)
+							}
+						}
+					}
+				}
+			if (strings.ToLower(data.Hosts[i].Addresses[j].AddrType)) == "ipv6"{
+				for k := 0; k < len(data.Hosts[i].Ports); k++{
+					if strings.ToLower(data.Hosts[i].Ports[k].State.State) == "open"{
+						if strings.ToLower(data.Hosts[i].Ports[k].Service.Name) == strings.ToLower(search){
+								s = append(s,data.Hosts[i].Addresses[j].Addr)
+							}
+					}
+				}
+			}
+		}
+	}
+	MultiLineStr(Unique(s))
 
 }
 
